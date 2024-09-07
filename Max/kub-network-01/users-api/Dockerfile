@@ -11,3 +11,6 @@ COPY . .
 EXPOSE 8080
 
 CMD [ "node", "users-app.js" ]
+
+
+## Image name: navi23/k8-networking-user-api
