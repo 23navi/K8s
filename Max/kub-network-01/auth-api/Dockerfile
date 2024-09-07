@@ -11,3 +11,6 @@ COPY . .
 EXPOSE 80
 
 CMD [ "node", "auth-app.js" ]
+
+
+## Image name: navi23/k8-networking-auth-api
