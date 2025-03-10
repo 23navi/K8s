@@ -16,4 +16,4 @@ spec:
     spec:
       containers:
       - name: user-container
-        image: nginx:latest
+        image: navi23/k8-networking-user-api
