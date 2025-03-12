@@ -1,0 +1,12 @@
+resources:
+  - deployment.yaml
+
+namespace: staging
+
+
+commonLabels:
+  env: staging
+  test: mystaging
+
+nameSuffix: -abc
+namePrefix: abc-

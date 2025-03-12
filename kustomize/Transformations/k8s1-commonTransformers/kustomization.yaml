@@ -1,0 +1,12 @@
+namespace: production
+
+resources:
+  - apps/
+  - dbs/
+
+commonLabels:
+  env: production
+
+
+nameSuffix: -xyz
+namePrefix: xyz-
