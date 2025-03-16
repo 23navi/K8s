@@ -1,0 +1,21 @@
+resources:
+  - api.yaml
+
+patches:
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: api-deployment
+      spec:
+        template:
+          spec:
+            containers:
+              - $patch: delete
+                image: memcached
+
+## When I am trying to delete the item in array with image name, all the containers are getting deleted?
+
+
+
+
