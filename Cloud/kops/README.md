@@ -94,3 +94,9 @@ Make the kops profile as default profile
 echo 'export AWS_PROFILE=kops' >> ~/.bashrc
 source ~/.bashrc
 ```
+
+
+Step 6: Install kops and kubectl on the bootstrap server
+
+[kops and kubectl on linux](https://kops.sigs.k8s.io/install/)
+
