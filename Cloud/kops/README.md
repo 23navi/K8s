@@ -300,3 +300,7 @@ So we can simply do
 
 `kubectl get nodes`
 
+
+----
+
+Note: We havn't seen a way to ssh into the ec2 instances created by our kops create command, we have a way where we pass the key pair to kops and it will use that public key while creating the ec2 instance so that we can ssh into those instances.
