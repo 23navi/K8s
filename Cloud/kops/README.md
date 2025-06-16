@@ -176,7 +176,6 @@ kops create cluster \
     --zones=ap-northeast-1a,ap-northeast-1c,ap-northeast-1d
 ```
 
-
 STEP X: Deleting the cluster
 
 Set the env variables
@@ -188,4 +187,116 @@ export KOPS_STATE_STORE=s3://23navi-kops-bootstrap-configuration-bucket
 
 To delete the cluster
 
-```kops delete cluster --name=${NAME} --yes```
+```bash
+kops delete cluster --name=${NAME} --yes
+```
+
+We can also mark our bootstrap ec2 instance to `stop` stage, it will keep the volume and we can restart it without losing any history or configs
+
+Step 12: Starting the cluster
+
+Note: Step 11 will just create the configurations, but it will not start the cluster.
+
+Note: When I ran cluster create command, it failed with the error
+
+```bash
+Error: control-plane-ap-northeast-1a.spec.image: Invalid value: "099720109477/ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20250502.1": specified image "099720109477/ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20250502.1" is invalid: could not find Image for "099720109477/ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20250502.1"
+```
+
+To solve, I manually changed the AMI for the control plane node
+
+```bash
+kops get ig --name ${NAME}
+```
+
+This will give me all the instance groups
+
+| NAME                          | ROLE         | MACHINETYPE | MIN | MAX | ZONES           |
+| ----------------------------- | ------------ | ----------- | --- | --- | --------------- |
+| control-plane-ap-northeast-1a | ControlPlane | t3.medium   | 1   | 1   | ap-northeast-1a |
+| nodes-ap-northeast-1a         | Node         | t3.medium   | 1   | 1   | ap-northeast-1a |
+| nodes-ap-northeast-1c         | Node         | t3.medium   | 1   | 1   | ap-northeast-1c |
+| nodes-ap-northeast-1d         | Node         | t3.medium   | 1   | 1   | ap-northeast-1d |
+
+Then I used the following command to update the AMI used for `control-plane-ap-northeast-1a`
+
+```bash
+kops edit ig control-plane-ap-northeast-1a --name ${NAME}
+```
+
+```yaml
+spec:
+  image: ami-054400ced365b82a0
+```
+
+I have opend an issue [kubernetes/kops issue: Invalid default master node image for ap-northeast-1 #17440
+](https://github.com/kubernetes/kops/issues/17440)
+
+---
+
+Finally to start the cluster
+
+```bash
+ kops update cluster --name ${NAME} --yes --admin
+```
+
+--admin is to make sure we have the admin privilages to the cluster
+
+By default it gives admin permissions for 18hrs, to increase it, we can do
+
+--admin=87600h
+
+We can also set the kubectl admin access to our kops cluster using
+
+```bash
+kops export kubecfg --admin=87600h
+```
+
+Step 13: Validating our cluster startup
+
+```bash
+kops validate cluster
+```
+
+This command will try to connect to our cluster using NLB and to all the nodes, if any of them is not up, this command will show failure.
+
+On successful validation , we will get something like
+
+```
+[ec2-user@ip-172-31-2-18 ~]$ kops validate cluster
+Using cluster from kubectl context: myfirstcluster.k8s.local
+
+Validating cluster myfirstcluster.k8s.local
+
+```
+
+INSTANCE GROUPS
+
+| NAME                          | ROLE         | MACHINETYPE | MIN | MAX             | SUBNETS         |
+| ----------------------------- | ------------ | ----------- | --- | --------------- | --------------- |
+| control-plane-ap-northeast-1a | ControlPlane | 1           | 1   | ap-northeast-1a |
+| nodes-ap-northeast-1a         | Node         | t3.medium   | 1   | 1               | ap-northeast-1a |
+| nodes-ap-northeast-1c         | Node         | t3.medium   | 1   | 1               | ap-northeast-1c |
+| nodes-ap-northeast-1d         | Node         | t3.medium   | 1   | 1               | ap-northeast-1d |
+
+NODE STATUS
+|NAME | ROLE | READY
+| ----------------------------- | ------------ | -----------
+|i-0052aec5b112719ed |control-plane |True
+|i-030f96686a8fe086d| node |True
+|i-0314c6279ab79b703 |node | True
+|i-0fc1c273e1b152aa0 |node | True
+
+```bash
+Your cluster myfirstcluster.k8s.local is ready
+```
+
+
+Note: kops will automatically populate our
+
+` ~/.kube/config `
+
+So we can simply do 
+
+`kubectl get nodes`
+
