@@ -45,8 +45,6 @@ AmazonVPCFullAccess
 AmazonSQSFullAccess
 AmazonEventBridgeFullAccess`
 
-
-
 ```bash
 aws iam create-group --group-name kops
 
@@ -71,7 +69,6 @@ aws iam add-user-to-group --user-name kops --group-name kops
 aws iam create-access-key --user-name kops
 ```
 
-
 Step 5: Launch a new EC2 instance in that region and we will run all kops bootstrap commands from that ec2 instance
 
 Note: By default ec2 instance won't have aws cli configured, so we can't make any calls from it.
@@ -81,12 +78,14 @@ We will take that kops user and add the cli configuration to this new bootstrap 
 ```bash
 aws configure --profile kops
 ```
+
 And add:
 
-`AWS Access Key ID [None]: AKIA...
+```bash
+AWS Access Key ID [None]: AKIA...
 AWS Secret Access Key [None]: abc123...
 Default region name [None]: ap-northeast-1
-
+```
 
 Make the kops profile as default profile
 
@@ -95,8 +94,58 @@ echo 'export AWS_PROFILE=kops' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-
 Step 6: Install kops and kubectl on the bootstrap server
 
 [kops and kubectl on linux](https://kops.sigs.k8s.io/install/)
+
+To verify the succesful installation of kops and kubectl run:
+
+```bash
+kops
+kubectl
+```
+
+Step 7: Export the aws secrets as env variables
+
+```bash
+# Because "aws configure" doesn't export these vars for kops to use, we export them now
+export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
+export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
+```
+
+Step 8: Setup the s3 configuration source bucket
+
+In order to store the state of your cluster, and the representation of your cluster, we need to create a dedicated S3 bucket for kops to use. This bucket will become the source of truth for our cluster configuration.
+
+```bash
+aws s3api create-bucket \
+    --bucket 23navi_kops_bootstrap_configuation_bucket \
+    --region ap-northeast-1
+```
+
+Note: Above command will not work as it only creates bucket for `us-east-1`
+
+To create bucket in any reason other than `us-east-1`
+
+Use the following endpoint:
+
+```bash
+aws s3api create-bucket \
+  --bucket 23navi-kops-bootstrap-configuration-bucket \
+  --region ap-northeast-1 \
+  --create-bucket-configuration LocationConstraint=ap-northeast-1
+```
+
+Step 9: Configure DNS
+
+Note: In the kops doc, we have a big section for configuration of DNS, but we will be skipping it as we will be using something called [gossip-based DNS](https://kops.sigs.k8s.io/gossip/)
+
+Step 10: Prepare local environment for cluster creation
+
+As we are using gossip-based DNS, we will suffix our dns as k8s.local
+
+```bash
+export NAME=myfirstcluster.k8s.local
+export KOPS_STATE_STORE=s3://23navi-kops-bootstrap-configuration-bucket
+```
 
