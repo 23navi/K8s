@@ -149,3 +149,43 @@ export NAME=myfirstcluster.k8s.local
 export KOPS_STATE_STORE=s3://23navi-kops-bootstrap-configuration-bucket
 ```
 
+Step 11: Create cluster configuration
+
+We need to specify all the az we want kops to create our nodes in, we should use multiple az for better DR
+
+To find the azs in the give region, we can run the following command:
+
+```bash
+aws ec2 describe-availability-zones --region ap-northeast-1
+```
+
+We will set 3 az for `ap-northeast-1`
+
+```bash
+ap-northeast-1a
+ap-northeast-1c
+ap-northeast-1d
+```
+
+Run the cluster create command with multiple azs
+
+```bash
+kops create cluster \
+    --name=${NAME} \
+    --cloud=aws \
+    --zones=ap-northeast-1a,ap-northeast-1c,ap-northeast-1d
+```
+
+
+STEP X: Deleting the cluster
+
+Set the env variables
+
+```bash
+export NAME=myfirstcluster.k8s.local
+export KOPS_STATE_STORE=s3://23navi-kops-bootstrap-configuration-bucket
+```
+
+To delete the cluster
+
+```kops delete cluster --name=${NAME} --yes```
