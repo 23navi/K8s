@@ -87,15 +87,23 @@ To verify the current cli session profile and region
 aws configure list
 ```
 
+Run aws commands to test
+
+```bash
+aws eks list-clusters
+```
+
 
 Step 6: Install kubectl on the bootstrap server
 
 [kops and kubectl on linux](https://kops.sigs.k8s.io/install/)
 
+Note: Make sure the kubectl client version is available on eks kubernetes version.
+
 To verify the succesful installation of kubectl run:
 
 ```bash
-kubectl
+kubectl version --client
 ```
 
 Step 7: Export the aws secrets as env variables
@@ -106,3 +114,31 @@ export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
 export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
 ```
 
+
+Step 8: Create the cluster using ekscluster
+
+Note: eksctl in the background just calls aws commands, eksctl is just a high level wrapper.
+
+```bash
+eksctl create cluster --name mycluster --nodes-min=3 --node-type=t3.medium
+```
+
+by default --node-type=m5.large (which is very expensive)
+
+The above create command will take around 5-10 mins to create the cluster.
+
+After creation of cluster, we can run the below command to verify the cluster
+
+```bash
+kubectl get all
+```
+
+Step 9: How to delete the cluster
+
+```bash
+eksctl cluster delete mycluster
+```
+
+This will take 5 min to delete the cluster but it will not delete the volumes (to keep your data)
+
+Note: It is good practice to verify that all the loadbalancers and ec2 instances are deleted.
