@@ -41,8 +41,6 @@ For permissions, we can use this list of inline policies
 Create group : eks_group
 Create user: eks_user and attach it to eks_group
 
-
-
 Step 3: Add this new user profile in aws cli on the bootstrap ec2 server
 
 ```bash
@@ -81,7 +79,7 @@ export AWS_PROFILE=nc
 export AWS_REGION=ap-northeast-1
 ```
 
-To verify the current cli session profile and region
+Step 5: To verify the current cli session profile and region
 
 ```bash
 aws configure list
@@ -92,7 +90,6 @@ Run aws commands to test
 ```bash
 aws eks list-clusters
 ```
-
 
 Step 6: Install kubectl on the bootstrap server
 
@@ -113,7 +110,6 @@ Step 7: Export the aws secrets as env variables
 export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
 export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
 ```
-
 
 Step 8: Create the cluster using ekscluster
 
@@ -136,9 +132,23 @@ kubectl get all
 Step 9: How to delete the cluster
 
 ```bash
-eksctl cluster delete mycluster
+eksctl delete cluster mycluster
 ```
 
 This will take 5 min to delete the cluster but it will not delete the volumes (to keep your data)
 
 Note: It is good practice to verify that all the loadbalancers and ec2 instances are deleted.
+
+Step 10: Run additional setup for using aws ebs as storage class in eks
+
+```bash
+eksctl utils associate-iam-oidc-provider --region=ap-northeast-1 --cluster=mycluster --approve
+
+eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster mycluster --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve  --role-only  --role-name AmazonEKS_EBS_CSI_DriverRole
+
+eksctl create addon --name aws-ebs-csi-driver --cluster mycluster --service-account-role-arn arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):role/AmazonEKS_EBS_CSI_DriverRole --force
+```
+
+Note: Second command failed with our Minimum IAM policies, so I added IAM Full access as a hack
+
+`arn:aws:iam::<account>:role/AmazonEKS_EBS_CSI_DriverRole` add this to our IAM inline policy
