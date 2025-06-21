@@ -41,8 +41,6 @@ For permissions, we can use this list of inline policies
 Create group : eks_group
 Create user: eks_user and attach it to eks_group
 
-
-
 Step 3: Add this new user profile in aws cli on the bootstrap ec2 server
 
 ```bash
@@ -93,7 +91,6 @@ Run aws commands to test
 aws eks list-clusters
 ```
 
-
 Step 6: Install kubectl on the bootstrap server
 
 [kops and kubectl on linux](https://kops.sigs.k8s.io/install/)
@@ -113,7 +110,6 @@ Step 7: Export the aws secrets as env variables
 export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
 export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
 ```
-
 
 Step 8: Create the cluster using ekscluster
 
@@ -136,14 +132,12 @@ kubectl get all
 Step 9: How to delete the cluster
 
 ```bash
-eksctl cluster delete mycluster
+eksctl delete cluster mycluster
 ```
 
 This will take 5 min to delete the cluster but it will not delete the volumes (to keep your data)
 
 Note: It is good practice to verify that all the loadbalancers and ec2 instances are deleted.
-
-
 
 Step 10: Run additional setup for using aws ebs as storage class in eks
 
@@ -157,4 +151,4 @@ eksctl create addon --name aws-ebs-csi-driver --cluster mycluster --service-acco
 
 Note: Second command failed with our Minimum IAM policies, so I added IAM Full access as a hack
 
-```arn:aws:iam::<account>:role/AmazonEKS_EBS_CSI_DriverRole``` add this to our IAM inline policy
+`arn:aws:iam::<account>:role/AmazonEKS_EBS_CSI_DriverRole` add this to our IAM inline policy
