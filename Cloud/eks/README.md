@@ -81,7 +81,7 @@ export AWS_PROFILE=nc
 export AWS_REGION=ap-northeast-1
 ```
 
-To verify the current cli session profile and region
+Step 5: To verify the current cli session profile and region
 
 ```bash
 aws configure list
@@ -142,3 +142,15 @@ eksctl cluster delete mycluster
 This will take 5 min to delete the cluster but it will not delete the volumes (to keep your data)
 
 Note: It is good practice to verify that all the loadbalancers and ec2 instances are deleted.
+
+
+
+Step 10: Run additional setup for using aws ebs as storage class in eks
+
+```bash
+eksctl utils associate-iam-oidc-provider --region=ap-northeast-1 --cluster=mycluster --approve
+
+eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster mycluster --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve  --role-only  --role-name AmazonEKS_EBS_CSI_DriverRole
+
+eksctl create addon --name aws-ebs-csi-driver --cluster mycluster --service-account-role-arn arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):role/AmazonEKS_EBS_CSI_DriverRole --force
+```
