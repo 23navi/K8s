@@ -154,3 +154,7 @@ eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-sy
 
 eksctl create addon --name aws-ebs-csi-driver --cluster mycluster --service-account-role-arn arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):role/AmazonEKS_EBS_CSI_DriverRole --force
 ```
+
+Note: Second command failed with our Minimum IAM policies, so I added IAM Full access as a hack
+
+```arn:aws:iam::<account>:role/AmazonEKS_EBS_CSI_DriverRole``` add this to our IAM inline policy
