@@ -127,3 +127,18 @@ by default --node-type=m5.large (which is very expensive)
 
 The above create command will take around 5-10 mins to create the cluster.
 
+After creation of cluster, we can run the below command to verify the cluster
+
+```bash
+kubectl get all
+```
+
+Step 9: How to delete the cluster
+
+```bash
+eksctl cluster delete mycluster
+```
+
+This will take 5 min to delete the cluster but it will not delete the volumes (to keep your data)
+
+Note: It is good practice to verify that all the loadbalancers and ec2 instances are deleted.
