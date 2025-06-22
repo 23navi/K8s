@@ -152,3 +152,15 @@ eksctl create addon --name aws-ebs-csi-driver --cluster mycluster --service-acco
 Note: Second command failed with our Minimum IAM policies, so I added IAM Full access as a hack
 
 `arn:aws:iam::<account>:role/AmazonEKS_EBS_CSI_DriverRole` add this to our IAM inline policy
+
+Step x: Set kubectl autocomplete and alias
+
+```bash
+
+source <(kubectl completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+echo "source <(kubectl completion bash)" >> ~/.bashrc # add autocomplete permanently to your bash shell.
+
+
+alias k=kubectl
+complete -o default -F __start_kubectl k
+```
