@@ -22,3 +22,11 @@ kubectl label namespace default istio-injection=enabled
 Now we can run our initial application on default namespace (the current state of our application will have bugs which we will fix over time using the features of istio)
 
 `k apply -f 4-application-full-stack.yaml`
+
+
+Note: The application is setup such a way that it exposes node port at port 30080
+The problem is that the ec2 instances we launched with eks does not allow inbound traffic on this port. So for a hack I have opend all tcp ports.
+
+Now the application is accessible on (<ip_of_any_of_my_ec2_instances>:30080)
+
+
