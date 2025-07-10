@@ -1,0 +1,24 @@
+# What do we want?
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  storageClassName: cloud-ssd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 7Gi
+---
+# How do we want it implemented
+
+## Normally, we would create a PersistentVolume so that our PersistentVolumeClaim can attach to it, but when we are in cloud environment, managing PersistentVolume on our own is not the right way. We create storage class and it creates PersistentVolume on it's own
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cloud-ssd
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
