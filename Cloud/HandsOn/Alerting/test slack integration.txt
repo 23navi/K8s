@@ -1,0 +1,6 @@
+curl -X POST --data-urlencode "payload={\"channel\": \"#alerts\", \"username\": \"webhookbot\", \"text\": \"This is posted to #alerts and comes from a bot named webhookbot.\", \"icon_emoji\": \":ghost:\"}" <webhook_url>
+
+
+Note: The webhook url for slack contains the access token, so don't expose it.
+
+Note: The 'username' here can be anything (eg: webhookbot-navi)
