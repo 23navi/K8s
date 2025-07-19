@@ -75,7 +75,7 @@ less ~/.aws/credentials
 To set the current session aws cli profile and region
 
 ```bash
-export AWS_PROFILE=nc
+export AWS_PROFILE=eks_user
 export AWS_REGION=ap-northeast-1
 ```
 
@@ -165,3 +165,32 @@ echo "source <(kubectl completion bash)" >> ~/.bashrc # add autocomplete permane
 alias k=kubectl
 complete -o default -F __start_kubectl k
 ```
+
+
+---
+
+Note: If we run  `kubectl describe node <nodename>`
+
+we will get
+
+```
+Capacity:
+  cpu:                2
+  ephemeral-storage:  83808236Ki
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             3919468Ki
+  pods:               17
+Allocatable:
+  cpu:                1930m
+  ephemeral-storage:  76163928346
+  hugepages-1Gi:      0
+  hugepages-2Mi:      0
+  memory:             3364460Ki
+  pods:               17
+
+```
+
+So there is a max no. of pods that can be deployed on a node and for `t3.medium` we have 17 pods.
+
+Refer to this  [stack-overflow](https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks) for better understanding on how this max no. is calculated and how we can increase it.
