@@ -194,3 +194,9 @@ Allocatable:
 So there is a max no. of pods that can be deployed on a node and for `t3.medium` we have 17 pods.
 
 Refer to this  [stack-overflow](https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks) for better understanding on how this max no. is calculated and how we can increase it.
+
+
+
+Note:
+- If we delete EKS Cluster, it will delete the EBS volumes too.
+
