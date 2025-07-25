@@ -10,3 +10,8 @@ aarch64 → arm64
 ```
 
 docker build --platform linux/amd64 -t navi23/my-fleetman-k8s-jenkins .
+
+
+
+I have update the jenkins service from NodePort to LoadBalancer so that I can use in on eks setup where I don't have SG set on EKS managed nodes to expose NodePort exposed port.
+
