@@ -11,7 +11,7 @@ $ ./get_helm.sh
 ### Adding prometheus stack on our eks cluster
 
 
-Got to `https://artifacthub.io/packages/helm/prometheus-community/prometheus`
+Got to `https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack`
 
 
 Add repo locally
@@ -24,53 +24,40 @@ helm repo update
 Installing chart with default settings
 
 ```
-helm install  monitoring prometheus-community/prometheus
+helm install  monitoring prometheus-community/kube-prometheus-stack
 ```
 
 output:
 
 ```
 NAME: monitoring
-LAST DEPLOYED: Sat Jul 26 15:42:14 2025
+LAST DEPLOYED: Sat Jul 26 16:05:20 2025
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
-TEST SUITE: None
 NOTES:
-The Prometheus server can be accessed via port 80 on the following DNS name from within your cluster:
-monitoring-prometheus-server.default.svc.cluster.local
+kube-prometheus-stack has been installed. Check its status by running:
+  kubectl --namespace default get pods -l "release=monitoring"
 
+Get Grafana 'admin' user password by running:
 
-Get the Prometheus server URL by running these commands in the same shell:
-  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=monitoring" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace default port-forward $POD_NAME 9090
+  kubectl --namespace default get secrets monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
 
+Access Grafana local instance:
 
-The Prometheus alertmanager can be accessed via port 9093 on the following DNS name from within your cluster:
-monitoring-alertmanager.default.svc.cluster.local
+  export POD_NAME=$(kubectl --namespace default get pod -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=monitoring" -oname)
+  kubectl --namespace default port-forward $POD_NAME 3000
 
-
-Get the Alertmanager URL by running these commands in the same shell:
-  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=alertmanager,app.kubernetes.io/instance=monitoring" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace default port-forward $POD_NAME 9093
-#################################################################################
-######   WARNING: Pod Security Policy has been disabled by default since    #####
-######            it deprecated after k8s 1.25+. use                        #####
-######            (index .Values "prometheus-node-exporter" "rbac"          #####
-###### .          "pspEnabled") with (index .Values                         #####
-######            "prometheus-node-exporter" "rbac" "pspAnnotations")       #####
-######            in case you still need it.                                #####
-#################################################################################
-
-
-The Prometheus PushGateway can be accessed via port 9091 on the following DNS name from within your cluster:
-monitoring-prometheus-pushgateway.default.svc.cluster.local
-
-
-Get the PushGateway URL by running these commands in the same shell:
-  export POD_NAME=$(kubectl get pods --namespace default -l "app=prometheus-pushgateway,component=pushgateway" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace default port-forward $POD_NAME 9091
-
-For more information on running Prometheus, visit:
-https://prometheus.io/
+Visit https://github.com/prometheus-operator/kube-prometheus for instructions on how to create & configure Alertmanager and Prometheus instances using the Operator.
 ```
+
+
+Note: When running on EKS, some of the pod will fail bec it requires PV which by default we didn't set on our EKS.
+
+
+To delete the entire stack, we can do 
+
+```
+helm uninstall monitoring
+```
+
