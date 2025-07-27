@@ -186,3 +186,31 @@ Step 3: Update the values using `--set`
 ```
 helm upgrade monitoring prometheus-community/kube-prometheus-stack --set grafana.adminPassword=Navi
 ```
+
+
+Output:
+
+```
+[ec2-user@ip-172-31-2-18 ~]$ helm upgrade monitoring prometheus-community/kube-prometheus-stack --set grafana.adminPassword=Navi
+Release "monitoring" has been upgraded. Happy Helming!
+NAME: monitoring
+LAST DEPLOYED: Sun Jul 27 04:38:59 2025
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+NOTES:
+kube-prometheus-stack has been installed. Check its status by running:
+  kubectl --namespace default get pods -l "release=monitoring"
+
+Get Grafana 'admin' user password by running:
+
+  kubectl --namespace default get secrets monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+
+Access Grafana local instance:
+
+  export POD_NAME=$(kubectl --namespace default get pod -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=monitoring" -oname)
+  kubectl --namespace default port-forward $POD_NAME 3000
+
+Visit https://github.com/prometheus-operator/kube-prometheus for instructions on how to create & configure Alertmanager and Prometheus instances using the Operator.
+```
+
