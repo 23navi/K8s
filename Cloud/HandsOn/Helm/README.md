@@ -107,3 +107,82 @@ Now we can acess the grafana dashboard on port 80
 eg: `a5bef4872992f4d4d925f0f70239670b-1156234268.ap-northeast-1.elb.amazonaws.com:80`
 
 
+#### Updating the default values
+
+So when we start our stack, we get grafana with default username and passowrd
+
+```yaml
+grafana:
+ ....
+  adminUser: admin
+  adminPassword: prom-operator
+```
+
+
+Now to update these values after our package deployment, we can use `helm update` command
+
+
+Step 1: Get the default `values.yaml` associated with the chart.
+
+```
+helm show values prometheus-community/kube-prometheus-stack > values.yaml
+```
+
+Step 2: Search for the config where the admin username and password for grafana is mentioned
+
+```yaml
+grafana:
+  enabled: true
+  namespaceOverride: ""
+  ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
+  ##
+  forceDeployDatasources: false
+  ## ForceDeployDashboard Create dashboard configmap even if grafana deployment has been disabled
+  ##
+  forceDeployDashboards: false
+  ## Deploy default dashboards
+  ##
+  defaultDashboardsEnabled: true
+  operator:
+    ## Enable references to ConfigMaps containing dashboards in GrafanaDashboard CRs
+    ## Set to true to allow dashboards to be loaded from ConfigMap references
+    dashboardsConfigMapRefEnabled: false
+    ## Annotations for GrafanaDashboard Cr
+    ##
+    annotations: {}
+    ## Labels that should be matched kind: Grafana instance
+    ## Example: { app: grafana, category: dashboard }
+    ##
+    matchLabels: {}
+    ## How frequently the operator should resync resources (in duration format)
+    ## Controls how often dashboards are reconciled by the operator
+    ##
+    resyncPeriod: 10m
+    ## Which folder all ddashboard in Grafana General means on Root level
+    ##
+    folder: General
+
+  ## Timezone for the default dashboards
+  ## Other options are: browser or a specific timezone, i.e. Europe/Luxembourg
+  ##
+  defaultDashboardsTimezone: utc
+
+  ## Editable flag for the default dashboards
+  ##
+  defaultDashboardsEditable: true
+
+  ## Default interval for Grafana dashboards
+  ##
+  defaultDashboardsInterval: 1m
+
+  adminUser: admin
+  adminPassword: prom-operator
+
+```
+
+
+Step 3: Update the values using `--set`
+
+```
+helm upgrade monitoring prometheus-community/kube-prometheus-stack --set grafana.adminPassword=Navi
+```
